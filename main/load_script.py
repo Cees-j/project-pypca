@@ -4,21 +4,8 @@ from sklearn.cluster import DBSCAN
 import numpy as np
 import matplotlib.pyplot as plt
 import json
+from read_json import extract_claims
 
-model = SentenceTransformer("all-MiniLM-L6-v2")
-file_path = './claims_data.json'
-
-
-with open(file_path, 'r') as file:
-    data = json.load(file)
-    claim_numbers = [claim['ClaimNumber'] for claim in data]
-    claim_descriptions = [claim['Description'] for claim in data]
-
-
-
-sentence_embeddings = model.encode(claim_descriptions, convert_to_numpy=True)
-pca = PCA(n_components=2) 
-pca_embeddings = pca.fit_transform(sentence_embeddings)
 
 def dbscan_plot_chart():
     print(pca_embeddings)
@@ -34,7 +21,7 @@ def dbscan_plot_chart():
     print(unique_clusters)
     print(largest_cluster)
 
-    # Colors for plotting
+
     colors = ['grey' if x == -1 else 'green' if x == largest_cluster else 'blue' for x in clusters]
 
 
@@ -51,6 +38,19 @@ def dbscan_plot_chart():
     plt.xlabel('Component 1')
     plt.ylabel('Component 2')
     plt.grid(True)
-    plt.savefig('output_images/DBSsentence_embeddings_plot4.png') 
+    plt.savefig('output_images/graph_image.png') 
 
-dbscan_plot_chart()
+
+
+if __name__ == "__main__":
+
+    model = SentenceTransformer("all-MiniLM-L6-v2")
+    file_path = './claims_data.json'
+
+
+    claim_numbers, claim_descriptions = extract_claims(file_path)
+
+    sentence_embeddings = model.encode(claim_descriptions, convert_to_numpy=True)
+    pca = PCA(n_components=2) 
+    pca_embeddings = pca.fit_transform(sentence_embeddings)
+    dbscan_plot_chart()
